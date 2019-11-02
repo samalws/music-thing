@@ -1,6 +1,7 @@
 import Numeric
 import System.Random
-import GSL.Random.Dist
+import Data.Random.Normal
+import Data.Hashable
 
 data Time = Time {timeVal :: Double} deriving (Eq, Ord, Show)
 data Amplitude = Amplitude {ampVal :: Double} deriving (Eq, Ord, Show)
@@ -66,14 +67,8 @@ squareWaveSound freq = funcToSound $ (\time -> if (floor (time * freq * 2) `mod`
 sawToothWaveSound :: Double -> Sound
 sawToothWaveSound freq = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
 
-seedAndTimeToSeed :: Int -> Double -> Int
-seedAndTimeToSeed seed time = floor $ time * 100000000 + fromIntegral seed
-
-randomNumberWithSeed :: Int -> Double
-randomNumberWithSeed seed = fst $ random $ mkStdGen seed
-
-staticSound :: Int {-seed-} -> Sound
-staticSound seed = funcToSound $ (\num -> ugaussianQInv $ randomNumberWithSeed $ seedAndTimeToSeed seed num)
+staticSound :: Int -> Sound
+staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
 
 amplitudeMultiply :: Double -> Filter
 amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
