@@ -1,10 +1,13 @@
 import Numeric
+import System.Random
+import GSL.Random.Dist
 
 data Time = Time {timeVal :: Double} deriving (Eq, Ord, Show)
 data Amplitude = Amplitude {ampVal :: Double} deriving (Eq, Ord, Show)
 data Sound = Sound {at :: Time -> Amplitude}
-data Filter = Filter {apply :: Sound -> Sound}
 data Sample = Sample {stepVal :: Time, ampsVal :: [Amplitude]} deriving (Show)
+type Filter = Sound -> Sound
+type Combiner = Sound -> Sound -> Sound
 type AmpFunc = Amplitude -> Amplitude
 type AmpCombinationFunc = Amplitude -> AmpFunc
 
@@ -46,7 +49,7 @@ funcToAmpCombinationFunc :: (Double -> Double -> Double) -> AmpCombinationFunc
 funcToAmpCombinationFunc f = funcToAmpFunc . f . ampVal
 
 timeAmpFuncToFilter :: (Time -> AmpFunc) -> Filter
-timeAmpFuncToFilter f = Filter (\sound -> Sound (\time -> f time $ sound `at` time))
+timeAmpFuncToFilter f sound = Sound (\time -> f time $ sound `at` time)
 
 ampFuncToFilter :: AmpFunc -> Filter
 ampFuncToFilter = timeAmpFuncToFilter . const
@@ -57,20 +60,41 @@ zeroSound = funcToSound $ const 0
 sineWaveSound :: Double -> Sound
 sineWaveSound freq = funcToSound $ sin . (* (pi * 2 * freq))
 
+squareWaveSound :: Double -> Sound
+squareWaveSound freq = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
+
+sawToothWaveSound :: Double -> Sound
+sawToothWaveSound freq = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
+
+seedAndTimeToSeed :: Int -> Double -> Int
+seedAndTimeToSeed seed time = floor $ time * 100000000 + fromIntegral seed
+
+randomNumberWithSeed :: Int -> Double
+randomNumberWithSeed seed = fst $ random $ mkStdGen seed
+
+staticSound :: Int {-seed-} -> Sound
+staticSound seed = funcToSound $ (\num -> ugaussianQInv $ randomNumberWithSeed $ seedAndTimeToSeed seed num)
+
 amplitudeMultiply :: Double -> Filter
 amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
 
-combineSounds :: AmpCombinationFunc -> Sound -> Filter
-combineSounds f sound = timeAmpFuncToFilter $ f . (at sound)
+timeFuncToFilter :: (Time -> Bool) -> Filter
+timeFuncToFilter f = timeAmpFuncToFilter (\time -> funcToAmpFunc $ if (f time) then id else (const 0))
 
-combineSoundsList :: AmpCombinationFunc -> [Sound] -> Sound
+specificTimeRange :: Time -> Time -> Filter
+specificTimeRange t1 t2 = timeFuncToFilter (\time -> time >= t1 && time <= t2)
+
+ampCombinationFuncToCombiner :: AmpCombinationFunc -> Combiner
+ampCombinationFuncToCombiner f sound = timeAmpFuncToFilter $ f . (at sound)
+
+combineSoundsList :: Combiner -> [Sound] -> Sound
 combineSoundsList f [] = zeroSound
 combineSoundsList f [sound] = sound
-combineSoundsList f (sound:sounds) = combineSounds f sound `apply` combineSoundsList f sounds
+combineSoundsList combiner (sound:sounds) = combiner sound $ combineSoundsList combiner sounds
 
 addSoundsList :: [Sound] -> Sound
-addSoundsList = combineSoundsList $ funcToAmpCombinationFunc (+)
+addSoundsList = combineSoundsList $ ampCombinationFuncToCombiner $ funcToAmpCombinationFunc (+)
 
-sound = amplitudeMultiply 0.1 `apply` addSoundsList [sineWaveSound 440, sineWaveSound 660]
+sound = amplitudeMultiply 0.05 $ staticSound 440
 
-main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 2) sound
+main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 1) sound
