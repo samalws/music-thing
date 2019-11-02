@@ -3,7 +3,10 @@ import Numeric
 data Time = Time {timeVal :: Double} deriving (Eq, Ord, Show)
 data Amplitude = Amplitude {ampVal :: Double} deriving (Eq, Ord, Show)
 data Sound = Sound {at :: Time -> Amplitude}
+data Filter = Filter {apply :: Sound -> Sound}
 data Sample = Sample {stepVal :: Time, ampsVal :: [Amplitude]} deriving (Show)
+type AmpFunc = Amplitude -> Amplitude
+type AmpCombinationFunc = Amplitude -> AmpFunc
 
 appendToSample :: Amplitude -> Sample -> Sample
 appendToSample amp samp = Sample (stepVal samp) (amp:(ampsVal samp))
@@ -36,24 +39,38 @@ funcToSound f = Sound $ Amplitude . f . timeVal
 soundToFunc :: Sound -> (Double -> Double)
 soundToFunc sound = ampVal . (at sound) . Time
 
+funcToAmpFunc :: (Double -> Double) -> AmpFunc
+funcToAmpFunc f = Amplitude . f . ampVal
+
+funcToAmpCombinationFunc :: (Double -> Double -> Double) -> AmpCombinationFunc
+funcToAmpCombinationFunc f = funcToAmpFunc . f . ampVal
+
+timeAmpFuncToFilter :: (Time -> AmpFunc) -> Filter
+timeAmpFuncToFilter f = Filter (\sound -> Sound (\time -> f time $ sound `at` time))
+
+ampFuncToFilter :: AmpFunc -> Filter
+ampFuncToFilter = timeAmpFuncToFilter . const
+
 zeroSound :: Sound
 zeroSound = funcToSound $ const 0
 
 sineWaveSound :: Double -> Sound
 sineWaveSound freq = funcToSound $ sin . (* (pi * 2 * freq))
 
-amplitudeMultiply :: Double -> Sound -> Sound
-amplitudeMultiply factor sound = funcToSound $ (* factor) . (soundToFunc sound)
+amplitudeMultiply :: Double -> Filter
+amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
 
-combineSounds :: (Double -> Double -> Double) -> Sound -> Sound -> Sound
-combineSounds f sound1 sound2 = funcToSound $ (\t -> (soundToFunc sound1 t) `f` (soundToFunc sound2 t))
+combineSounds :: AmpCombinationFunc -> Sound -> Filter
+combineSounds f sound = timeAmpFuncToFilter $ f . (at sound)
 
-combineSoundsList :: (Double -> Double -> Double) -> [Sound] -> Sound
-combineSoundsList f = foldl (combineSounds f) zeroSound
+combineSoundsList :: AmpCombinationFunc -> [Sound] -> Sound
+combineSoundsList f [] = zeroSound
+combineSoundsList f [sound] = sound
+combineSoundsList f (sound:sounds) = combineSounds f sound `apply` combineSoundsList f sounds
 
 addSoundsList :: [Sound] -> Sound
-addSoundsList = combineSoundsList (+)
+addSoundsList = combineSoundsList $ funcToAmpCombinationFunc (+)
 
-sound = amplitudeMultiply 0.05 $ addSoundsList [sineWaveSound 440, sineWaveSound (440*1.5), sineWaveSound (440*4/3)]
+sound = amplitudeMultiply 0.1 `apply` addSoundsList [sineWaveSound 440, sineWaveSound 660]
 
-main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 3) sound
+main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 2) sound
