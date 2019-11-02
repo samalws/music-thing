@@ -48,11 +48,12 @@ amplitudeMultiply factor sound = funcToSound $ (* factor) . (soundToFunc sound)
 combineSounds :: (Double -> Double -> Double) -> Sound -> Sound -> Sound
 combineSounds f sound1 sound2 = funcToSound $ (\t -> (soundToFunc sound1 t) `f` (soundToFunc sound2 t))
 
-addSounds :: Sound -> Sound -> Sound
-addSounds = combineSounds (+)
+combineSoundsList :: (Double -> Double -> Double) -> [Sound] -> Sound
+combineSoundsList f = foldl (combineSounds f) zeroSound
 
-sound1 = sineWaveSound 440
-sound2 = sineWaveSound (440*1.5)
-sound3 = amplitudeMultiply 0.05 $ addSounds sound1 sound2
+addSoundsList :: [Sound] -> Sound
+addSoundsList = combineSoundsList (+)
 
-main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 3) sound3
+sound = amplitudeMultiply 0.05 $ addSoundsList [sineWaveSound 440, sineWaveSound (440*1.5), sineWaveSound (440*4/3)]
+
+main = putStr $ sampleToDat $ makeSample (Time $ 1 / 44100) (Time 3) sound
