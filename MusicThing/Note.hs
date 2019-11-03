@@ -6,19 +6,25 @@ import MusicThing.SoundSequence
 
 data Note = Note {freqVal :: Double} deriving (Eq)
 type Tone = Note -> Sound
-type NoteSequence = [(Note, Time)]
 
 rest :: Note
 rest = Note (-1)
 
-noteSequenceToSoundSequence :: Tone -> NoteSequence -> SoundSequence
-noteSequenceToSoundSequence tone = map (\(note, t) -> if (note == rest) then (zeroSound, t) else (tone note, t))
-
 equalTempNote :: Int -> Note
 equalTempNote = Note . (* 440) . ((2 ** (1 / 12)) **) . fromIntegral
 
-noteDoubleSequenceToSound :: Tone -> [(Note, Double)] -> Sound
-noteDoubleSequenceToSound tone = soundSequenceToSound . noteSequenceToSoundSequence tone . doubleToTimeInSequence
+letterNote :: Int -> Int -> Note
+letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)
 
-noteDoubleSequencesToSound :: Tone -> [[(Note, Double)]] -> Sound
-noteDoubleSequencesToSound tone = averageSound . (map $ noteDoubleSequenceToSound tone)
+_C = letterNote (-9)
+_Db = letterNote (-8)
+_D = letterNote (-7)
+_Eb = letterNote (-6)
+_E = letterNote (-5)
+_F = letterNote (-4)
+_Gb = letterNote (-3)
+_G = letterNote (-2)
+_Ab = letterNote (-1)
+_A = letterNote 0
+_Bb = letterNote 1
+_B = letterNote 2

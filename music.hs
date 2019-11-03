@@ -3,7 +3,7 @@ import MusicThing.Filter
 import MusicThing.Util
 import MusicThing.File
 import MusicThing.Note
-import MusicThing.SoundSequence
+import MusicThing.NoteSequence
 
 sequ1 :: [(Note, Double)]
 sequ1 = [(_A 4, 1), (_B 4, 1), (rest, 1), (_D 5, 1)]

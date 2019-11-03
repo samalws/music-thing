@@ -6,6 +6,9 @@ type Filter = Sound -> Sound
 type TimeFunc = Time -> Time
 type AmpFunc = Amplitude -> Amplitude
 
+combineFilters :: Filter -> Filter -> Filter
+combineFilters = (.)
+
 funcToTimeFunc :: (Double -> Double) -> TimeFunc
 funcToTimeFunc f = Time . f . timeVal
 
