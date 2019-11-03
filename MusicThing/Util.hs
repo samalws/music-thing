@@ -4,6 +4,7 @@ import MusicThing.Sound
 import MusicThing.Filter
 import MusicThing.Combiner
 import MusicThing.Note
+import MusicThing.Instrument
 import System.Random
 import Data.Random.Normal
 import Data.Hashable
@@ -20,14 +21,11 @@ sawToothWaveTone (Note freq) = funcToSound $ (\time -> time - (fromInteger (floo
 staticSound :: Int -> Sound
 staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
 
-amplitudeMultiply :: Double -> Filter
-amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
-
 averageSound :: [Sound] -> Sound
 averageSound sounds = amplitudeMultiply (1 / (fromIntegral $ length sounds)) $ combineSoundsList addCombiner sounds
 
 instrumentTone :: Tone
-instrumentTone (Note freq) = averageSound [amplitudeMultiply 1.5 $ sineWaveTone $ Note freq, sineWaveTone $ Note (freq * 1.5), amplitudeMultiply 0.5 $ sineWaveTone $ Note freq]
+instrumentTone = instrumentToTone sineWaveTone [(1, 1.5), (1.5, 1), (2, 0.5)]
 
 letterNote :: Int -> Int -> Note
 letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)

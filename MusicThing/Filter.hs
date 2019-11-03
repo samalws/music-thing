@@ -29,3 +29,6 @@ lengthFilter time = timeConstraintFilter (\time2 -> time2 >= (Time 0) && time2 <
 
 timeOffsetFilter :: Time -> Filter
 timeOffsetFilter (Time time) = timeFuncToFilter $ funcToTimeFunc $ (\x -> x - time)
+
+amplitudeMultiply :: Double -> Filter
+amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
