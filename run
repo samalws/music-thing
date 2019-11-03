@@ -1,5 +1,4 @@
 ./compile music
-./music > a.dat
-sox a.dat a.wav
+./music
 mpv a.wav
 rm a.dat a.wav music

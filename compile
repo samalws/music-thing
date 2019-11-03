@@ -1,3 +1,3 @@
 ghc -Wno-tabs $1.hs
-rm $1.hi $1.o
+rm *.hi *.o
 rm */*.hi */*.o
