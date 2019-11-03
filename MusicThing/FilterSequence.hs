@@ -6,16 +6,16 @@ import MusicThing.Filter
 type FilterSequence = [(Filter, Time)]
 type TimeSensitiveFilterSequence = [(TimeSensitiveFilter, Time)]
 
-timeOffsetFilterSequenceToTimeSensitiveFilter :: TimeSensitiveFilterSequence -> TimeSensitiveFilter
-timeOffsetFilterSequenceToTimeSensitiveFilter [] = filterToTimeSensitiveFilter idFilter
-timeOffsetFilterSequenceToTimeSensitiveFilter [(filter, length)] = cutoffTimeSensitiveFilter length filter
-timeOffsetFilterSequenceToTimeSensitiveFilter (a:b) = timeOffsetFilterSequenceToTimeSensitiveFilter [a] `combineTimeSensitiveFilters` (offsetTimeSensitiveFilter (snd a) $ timeOffsetFilterSequenceToTimeSensitiveFilter b)
+timeSensitiveFilterSequenceToTimeSensitiveFilter :: TimeSensitiveFilterSequence -> TimeSensitiveFilter
+timeSensitiveFilterSequenceToTimeSensitiveFilter [] = filterToTimeSensitiveFilter idFilter
+timeSensitiveFilterSequenceToTimeSensitiveFilter [(filter, length)] = cutoffTimeSensitiveFilter length filter
+timeSensitiveFilterSequenceToTimeSensitiveFilter (a:b) = timeSensitiveFilterSequenceToTimeSensitiveFilter [a] `combineTimeSensitiveFilters` (offsetTimeSensitiveFilter (snd a) $ timeSensitiveFilterSequenceToTimeSensitiveFilter b)
 
-timeOffsetFilterSequenceToFilter :: TimeSensitiveFilterSequence -> Filter
-timeOffsetFilterSequenceToFilter = ($ Time 0) . timeOffsetFilterSequenceToTimeSensitiveFilter
+timeSensitiveFilterSequenceToFilter :: TimeSensitiveFilterSequence -> Filter
+timeSensitiveFilterSequenceToFilter = ($ Time 0) . timeSensitiveFilterSequenceToTimeSensitiveFilter
 
 filterSequenceToTimeSensitiveFilter :: FilterSequence -> TimeSensitiveFilter
-filterSequenceToTimeSensitiveFilter = timeOffsetFilterSequenceToTimeSensitiveFilter . map (\(filter, time) -> (filterToTimeSensitiveFilter filter, time))
+filterSequenceToTimeSensitiveFilter = timeSensitiveFilterSequenceToTimeSensitiveFilter . map (\(filter, time) -> (filterToTimeSensitiveFilter filter, time))
 
 filterSequenceToFilter :: FilterSequence -> Filter
 filterSequenceToFilter = ($ Time 0) . filterSequenceToTimeSensitiveFilter

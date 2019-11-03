@@ -23,3 +23,9 @@ staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
 
 instrumentTone :: Tone
 instrumentTone = instrumentToTone sineWaveTone [(1, 1.5), (1.5, 1), (2, 0.5)]
+
+crescendo :: Double -> Double -> Time -> TimeSensitiveFilter
+crescendo a1 a2 (Time length) (Time startTime) = timeAmpFuncToFilter (\(Time time) ->
+	funcToAmpFunc (*
+		(((a2 - a1) * (time - startTime) / length) + a1)
+	))
