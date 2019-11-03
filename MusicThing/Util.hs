@@ -8,20 +8,26 @@ import System.Random
 import Data.Random.Normal
 import Data.Hashable
 
-sineWaveSound :: Tone
-sineWaveSound (Note freq) = funcToSound $ sin . (* (pi * 2 * freq))
+sineWaveTone :: Tone
+sineWaveTone (Note freq) = funcToSound $ sin . (* (pi * 2 * freq))
 
-squareWaveSound :: Tone
-squareWaveSound (Note freq) = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
+squareWaveTone :: Tone
+squareWaveTone (Note freq) = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
 
-sawToothWaveSound :: Tone
-sawToothWaveSound (Note freq) = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
+sawToothWaveTone :: Tone
+sawToothWaveTone (Note freq) = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
 
 staticSound :: Int -> Sound
 staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
 
 amplitudeMultiply :: Double -> Filter
 amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
+
+averageSound :: [Sound] -> Sound
+averageSound sounds = amplitudeMultiply (1 / (fromIntegral $ length sounds)) $ combineSoundsList addCombiner sounds
+
+instrumentTone :: Tone
+instrumentTone (Note freq) = averageSound [amplitudeMultiply 1.5 $ sineWaveTone $ Note freq, sineWaveTone $ Note (freq * 1.5), amplitudeMultiply 0.5 $ sineWaveTone $ Note freq]
 
 letterNote :: Int -> Int -> Note
 letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)

@@ -4,6 +4,7 @@ import MusicThing.File
 import MusicThing.Note
 import MusicThing.SoundSequence
 
-sound = amplitudeMultiply 0.05 $ soundSequenceToSound $ noteSequenceToSoundSequence sineWaveSound [((_A 4), (Time 1)), ((_B 4), (Time 1))]
+sequ = [(_A 4, 1), (_B 4, 1), (_C 5, 1), (_D 5, 1)]
+sound = amplitudeMultiply 0.5 $ soundSequenceToSound $ noteSequenceToSoundSequence instrumentTone $ doubleToTimeInSequence sequ
 
 main = songToWav "a" 4 sound
