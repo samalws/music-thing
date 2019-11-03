@@ -3,6 +3,7 @@ module MusicThing.Filter where
 import MusicThing.Sound
 
 type Filter = Sound -> Sound
+type TimeSensitiveFilter = Time -> Filter
 type TimeFunc = Time -> Time
 type AmpFunc = Amplitude -> Amplitude
 
@@ -33,5 +34,25 @@ lengthFilter time = timeConstraintFilter (\time2 -> time2 >= (Time 0) && time2 <
 timeOffsetFilter :: Time -> Filter
 timeOffsetFilter (Time time) = timeFuncToFilter $ funcToTimeFunc $ (\x -> x - time)
 
+filterToTimeSensitiveFilter :: Filter -> TimeSensitiveFilter
+filterToTimeSensitiveFilter = const
+
+idFilter :: Filter
+idFilter = ampFuncToFilter $ funcToAmpFunc id
+
 amplitudeMultiply :: Double -> Filter
 amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
+
+cutoffTimeSensitiveFilter :: Time -> TimeSensitiveFilter -> TimeSensitiveFilter
+cutoffTimeSensitiveFilter length t_s_Filter startTime sound = let cutoffTime = Time (timeVal startTime + timeVal length) in
+	Sound (\time ->
+		if (time >= startTime && time <= cutoffTime) then
+			t_s_Filter startTime sound `at` time
+		else sound `at` time
+	)
+
+offsetTimeSensitiveFilter :: Time -> TimeSensitiveFilter -> TimeSensitiveFilter
+offsetTimeSensitiveFilter time filter time2 = filter $ Time $ timeVal time + timeVal time2
+
+combineTimeSensitiveFilters :: TimeSensitiveFilter -> TimeSensitiveFilter -> TimeSensitiveFilter
+combineTimeSensitiveFilters filter1 filter2 time = combineFilters (filter1 time) (filter2 time)
