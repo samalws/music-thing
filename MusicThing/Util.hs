@@ -3,18 +3,19 @@ module MusicThing.Util where
 import MusicThing.Sound
 import MusicThing.Filter
 import MusicThing.Combiner
+import MusicThing.Note
 import System.Random
 import Data.Random.Normal
 import Data.Hashable
 
-sineWaveSound :: Double -> Sound
-sineWaveSound freq = funcToSound $ sin . (* (pi * 2 * freq))
+sineWaveSound :: Tone
+sineWaveSound (Note freq) = funcToSound $ sin . (* (pi * 2 * freq))
 
-squareWaveSound :: Double -> Sound
-squareWaveSound freq = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
+squareWaveSound :: Tone
+squareWaveSound (Note freq) = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
 
-sawToothWaveSound :: Double -> Sound
-sawToothWaveSound freq = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
+sawToothWaveSound :: Tone
+sawToothWaveSound (Note freq) = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
 
 staticSound :: Int -> Sound
 staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
@@ -22,11 +23,18 @@ staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
 amplitudeMultiply :: Double -> Filter
 amplitudeMultiply = ampFuncToFilter . funcToAmpFunc . (*)
 
-timeFuncToFilter :: (Time -> Bool) -> Filter
-timeFuncToFilter f = timeAmpFuncToFilter (\time -> funcToAmpFunc $ if (f time) then id else (const 0))
+letterNote :: Int -> Int -> Note
+letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)
 
-specificTimeRange :: Time -> Time -> Filter
-specificTimeRange t1 t2 = timeFuncToFilter (\time -> time >= t1 && time <= t2)
-
-addSoundsList :: [Sound] -> Sound
-addSoundsList = combineSoundsList $ ampCombinationFuncToCombiner $ funcToAmpCombinationFunc (+)
+_C = letterNote (-9)
+_Db = letterNote (-8)
+_D = letterNote (-7)
+_Eb = letterNote (-6)
+_E = letterNote (-5)
+_F = letterNote (-4)
+_Gb = letterNote (-3)
+_G = letterNote (-2)
+_Ab = letterNote (-1)
+_A = letterNote 0
+_Bb = letterNote 1
+_B = letterNote 2

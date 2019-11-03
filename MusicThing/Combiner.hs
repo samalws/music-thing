@@ -16,3 +16,6 @@ combineSoundsList :: Combiner -> [Sound] -> Sound
 combineSoundsList f [] = zeroSound
 combineSoundsList f [sound] = sound
 combineSoundsList combiner (sound:sounds) = combiner sound $ combineSoundsList combiner sounds
+
+addCombiner :: Combiner
+addCombiner = ampCombinationFuncToCombiner $ funcToAmpCombinationFunc (+)

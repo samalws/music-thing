@@ -1,4 +1,4 @@
-module MusicThing.File where
+module MusicThing.File (songToWav) where
 
 import MusicThing.Sound
 import MusicThing.Sample
