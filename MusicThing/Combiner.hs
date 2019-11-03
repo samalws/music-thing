@@ -19,3 +19,6 @@ combineSoundsList combiner (sound:sounds) = combiner sound $ combineSoundsList c
 
 addCombiner :: Combiner
 addCombiner = ampCombinationFuncToCombiner $ funcToAmpCombinationFunc (+)
+
+averageSound :: [Sound] -> Sound
+averageSound sounds = amplitudeMultiply (1 / (fromIntegral $ length sounds)) $ combineSoundsList addCombiner sounds
