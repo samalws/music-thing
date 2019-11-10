@@ -10,22 +10,20 @@ import Data.Random.Normal
 import Data.Hashable
 
 sineWaveTone :: Tone
-sineWaveTone (Note freq) = funcToSound $ sin . (* (pi * 2 * freq))
+sineWaveTone (Note freq) = sin . (* (pi * 2 * freq))
 
 squareWaveTone :: Tone
-squareWaveTone (Note freq) = funcToSound $ (\time -> if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1)
+squareWaveTone (Note freq) time = if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1
 
 sawToothWaveTone :: Tone
-sawToothWaveTone (Note freq) = funcToSound $ (\time -> time - (fromInteger (floor time) :: Double)) . (* freq)
+sawToothWaveTone (Note freq) time = (time - (fromInteger (floor time) :: Double)) * freq
 
 staticSound :: Int -> Sound
-staticSound salt = funcToSound $ fst . normal . mkStdGen . hashWithSalt salt
+staticSound salt = fst . normal . mkStdGen . hashWithSalt salt
 
 instrumentTone :: Tone
 instrumentTone = instrumentToTone sineWaveTone [(1, 1.5), (1.5, 1), (2, 0.5)]
 
 crescendo :: Double -> Double -> Time -> TimeSensitiveFilter
-crescendo a1 a2 (Time length) (Time startTime) = timeAmpFuncToFilter (\(Time time) ->
-	funcToAmpFunc (*
-		(((a2 - a1) * (time - startTime) / length) + a1)
-	))
+crescendo a1 a2 length startTime = timeAmpFuncToFilter (\time ->
+	(* (((a2 - a1) * (time - startTime) / length) + a1)))

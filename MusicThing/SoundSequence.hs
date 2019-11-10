@@ -12,4 +12,4 @@ soundSequenceToSound [(sound, length)] = lengthFilter length sound
 soundSequenceToSound (a:b) = addCombiner (soundSequenceToSound [a]) $ timeOffsetFilter (snd a) (soundSequenceToSound b)
 
 doubleToTimeInSequence :: [(a, Double)] -> [(a, Time)]
-doubleToTimeInSequence = map (\(thing, t) -> (thing, Time t))
+doubleToTimeInSequence = map (\(thing, t) -> (thing, t))

@@ -12,10 +12,10 @@ timeSensitiveFilterSequenceToTimeSensitiveFilter [(filter, length)] = cutoffTime
 timeSensitiveFilterSequenceToTimeSensitiveFilter (a:b) = timeSensitiveFilterSequenceToTimeSensitiveFilter [a] `combineTimeSensitiveFilters` (offsetTimeSensitiveFilter (snd a) $ timeSensitiveFilterSequenceToTimeSensitiveFilter b)
 
 timeSensitiveFilterSequenceToFilter :: TimeSensitiveFilterSequence -> Filter
-timeSensitiveFilterSequenceToFilter = ($ Time 0) . timeSensitiveFilterSequenceToTimeSensitiveFilter
+timeSensitiveFilterSequenceToFilter = ($ 0) . timeSensitiveFilterSequenceToTimeSensitiveFilter
 
 filterSequenceToTimeSensitiveFilter :: FilterSequence -> TimeSensitiveFilter
 filterSequenceToTimeSensitiveFilter = timeSensitiveFilterSequenceToTimeSensitiveFilter . map (\(filter, time) -> (filterToTimeSensitiveFilter filter, time))
 
 filterSequenceToFilter :: FilterSequence -> Filter
-filterSequenceToFilter = ($ Time 0) . filterSequenceToTimeSensitiveFilter
+filterSequenceToFilter = ($ 0) . filterSequenceToTimeSensitiveFilter
