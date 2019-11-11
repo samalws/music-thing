@@ -4,14 +4,14 @@ import MusicThing.Sound
 import MusicThing.Combiner
 import MusicThing.SoundSequence
 
-data Note = Note {freqVal :: Double} deriving (Eq)
+type Note = Double {-frequency-}
 type Tone = Note -> Sound
 
 rest :: Note
-rest = Note (-1)
+rest = (-1)
 
 equalTempNote :: Int -> Note
-equalTempNote = Note . (* 440) . ((2 ** (1 / 12)) **) . fromIntegral
+equalTempNote = (* 440) . ((2 ** (1 / 12)) **) . fromIntegral
 
 letterNote :: Int -> Int -> Note
 letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)

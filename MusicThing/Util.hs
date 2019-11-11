@@ -10,13 +10,13 @@ import Data.Random.Normal
 import Data.Hashable
 
 sineWaveTone :: Tone
-sineWaveTone (Note freq) = sin . (* (pi * 2 * freq))
+sineWaveTone freq = sin . (* (pi * 2 * freq))
 
 squareWaveTone :: Tone
-squareWaveTone (Note freq) time = if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1
+squareWaveTone freq time = if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1
 
 sawToothWaveTone :: Tone
-sawToothWaveTone (Note freq) time = (time - (fromInteger (floor time) :: Double)) * freq
+sawToothWaveTone freq time = (time - (fromInteger (floor time) :: Double)) * freq
 
 staticSound :: Int -> Sound
 staticSound salt = fst . normal . mkStdGen . hashWithSalt salt

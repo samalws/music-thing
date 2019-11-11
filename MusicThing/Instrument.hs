@@ -7,8 +7,8 @@ import MusicThing.Note
 type Instrument = [(Double, Double)]
 
 instrumentToTone :: Tone -> Instrument -> Tone
-instrumentToTone tone instrument (Note freq) =
+instrumentToTone tone instrument freq =
 	amplitudeMultiply (1 / (sum $ map snd instrument)) $
 	combineSoundsList addCombiner $ map
-		(\(freqMult, vol) -> amplitudeMultiply vol $ tone $ Note $ freqMult * freq)
+		(\(freqMult, vol) -> amplitudeMultiply vol $ tone $ freqMult * freq)
 		instrument
