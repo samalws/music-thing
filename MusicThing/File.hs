@@ -2,16 +2,17 @@ module MusicThing.File (songToWav) where
 
 import MusicThing.Sound
 import MusicThing.Sample
+import MusicThing.LengthSound
 import System.IO
 import System.Process
 
-writeSoundToDat :: FilePath -> Double {-length-} -> Sound -> IO ()
-writeSoundToDat path length sound = writeFile path $ sampleToDat $ makeSample (1 / 44100) length sound
+writeLengthSoundToDat :: FilePath -> LengthSound -> IO ()
+writeLengthSoundToDat path lengthSound = writeFile path $ sampleToDat $ makeSample (1 / 44100) lengthSound
 
 datToWav :: FilePath -> FilePath -> IO ()
 datToWav path1 path2 = callCommand ("sox " ++ path1 ++ " " ++ path2)
 
-songToWav :: FilePath -> Double {-length-} -> Sound -> IO ()
-songToWav path length sound = let pathDat = path ++ ".dat" in
-	writeSoundToDat pathDat length sound >>
+songToWav :: FilePath -> LengthSound -> IO ()
+songToWav path lengthSound = let pathDat = path ++ ".dat" in
+	writeLengthSoundToDat pathDat lengthSound >>
 	datToWav pathDat (path ++ ".wav")

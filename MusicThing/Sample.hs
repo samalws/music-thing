@@ -1,6 +1,7 @@
 module MusicThing.Sample (Sample, makeSample, sampleToDat) where
 
 import MusicThing.Sound
+import MusicThing.LengthSound
 import Numeric
 
 data Sample = Sample {stepVal :: Time, ampsVal :: [Amplitude]} deriving (Show)
@@ -8,13 +9,13 @@ data Sample = Sample {stepVal :: Time, ampsVal :: [Amplitude]} deriving (Show)
 appendToSample :: Amplitude -> Sample -> Sample
 appendToSample amp samp = Sample (stepVal samp) (amp:(ampsVal samp))
 
-makeSampleHelper :: Time {-starting point-} -> Time {-step length-} -> Time {-length-} -> Sound -> Sample
-makeSampleHelper startingPoint step length sound
+makeSampleHelper :: Time {-starting point-} -> Time {-step length-} -> LengthSound -> Sample
+makeSampleHelper startingPoint step (sound, length)
 	| startingPoint > length = Sample step []
 	| otherwise = (sound startingPoint) `appendToSample`
-		(makeSampleHelper (startingPoint + step) step length sound)
+		(makeSampleHelper (startingPoint + step) step (sound, length))
 
-makeSample :: Time {-step length-} -> Time {-length-} -> Sound -> Sample
+makeSample :: Time {-step length-} -> LengthSound -> Sample
 makeSample = makeSampleHelper 0
 
 sampleToDatHead :: Sample -> String
