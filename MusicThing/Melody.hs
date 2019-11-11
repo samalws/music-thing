@@ -2,9 +2,9 @@ module MusicThing.Melody where
 
 import MusicThing.Sound
 import MusicThing.NoteSequence
-import MusicThing.Chord
+import MusicThing.NoteSet
 
-type Melody = [(ChordMember, Time)]
+type Melody = [(NoteSetMember, Time)]
 
-melodyToNoteSequence :: Chord -> Melody -> NoteSequence
-melodyToNoteSequence chord = map (\(chordMember, time) -> (chord chordMember, time))
+melodyToNoteSequence :: NoteSet -> Melody -> NoteSequence
+melodyToNoteSequence noteSet = map (\(noteSetMember, time) -> (noteSet noteSetMember, time))

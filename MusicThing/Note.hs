@@ -6,6 +6,7 @@ import MusicThing.SoundSequence
 
 type Note = Double {-frequency-}
 type Tone = Note -> Sound
+type Octave = Int
 
 rest :: Note
 rest = (-1)
@@ -13,7 +14,7 @@ rest = (-1)
 equalTempNote :: Int -> Note
 equalTempNote = (* 440) . ((2 ** (1 / 12)) **) . fromIntegral
 
-letterNote :: Int -> Int -> Note
+letterNote :: Int -> Octave -> Note
 letterNote halfSteps octave = equalTempNote (halfSteps + (octave - 4) * 12)
 
 _C = letterNote (-9)
