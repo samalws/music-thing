@@ -22,12 +22,6 @@ sawToothWaveTone freq time = (time * freq - (fromInteger (floor $ freq * time) :
 staticSound :: Int -> Sound
 staticSound salt = fst . normal . mkStdGen . hashWithSalt salt
 
-instrumentTone :: Tone
-instrumentTone = instrumentToTone sineWaveTone [(1, 1.5), (1.5, 1), (2, 0.5)]
-
 crescendo :: Double -> Double -> Time -> TimeSensitiveFilter
 crescendo a1 a2 length startTime = timeAmpFuncToFilter (\time ->
 	(* (((a2 - a1) * (time - startTime) / length) + a1)))
-
-aMinorScale :: NoteSet
-aMinorScale = listToNoteSet $ map (. (+ 4)) [_A . (+ (-1)), _B . (+ (-1)), _C, _D, _E, _Gb, _Ab, _A]
