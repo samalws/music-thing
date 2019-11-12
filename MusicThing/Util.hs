@@ -17,7 +17,7 @@ squareWaveTone :: Tone
 squareWaveTone freq time = if (floor (time * freq * 2) `mod` 2 == 1) then 1 else -1
 
 sawToothWaveTone :: Tone
-sawToothWaveTone freq time = (time - (fromInteger (floor time) :: Double)) * freq
+sawToothWaveTone freq time = (time * freq - (fromInteger (floor $ freq * time) :: Double)) * 2 - 1
 
 staticSound :: Int -> Sound
 staticSound salt = fst . normal . mkStdGen . hashWithSalt salt
