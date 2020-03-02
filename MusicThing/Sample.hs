@@ -9,10 +9,10 @@ appendToSample :: Amplitude -> Sample -> Sample
 appendToSample amp samp = Sample (stepVal samp) (amp:(ampsVal samp))
 
 makeSampleHelper :: Time {-starting point-} -> Time {-step length-} -> LengthSound -> Sample
-makeSampleHelper startingPoint step (sound, length)
+makeSampleHelper startingPoint step (length, sound)
 	| startingPoint > length = Sample step []
 	| otherwise = (sound startingPoint) `appendToSample`
-		(makeSampleHelper (startingPoint + step) step (sound, length))
+		(makeSampleHelper (startingPoint + step) step (length, sound))
 
 makeSample :: Time {-step length-} -> LengthSound -> Sample
 makeSample = makeSampleHelper 0

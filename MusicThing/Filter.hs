@@ -1,7 +1,7 @@
-module MusicThing.Filters where
+module MusicThing.Filter where
 
 import MusicThing.Types
-import MusicThing.Sounds
+import MusicThing.Sound
 
 idFilter :: Filter
 idFilter = id
@@ -24,6 +24,9 @@ endTimeFilter endTime sound time = (if (time > endTime) then zeroSound else soun
 timeRangeFilter :: TimeRange -> Filter
 timeRangeFilter (startTime, endTime) = startTimeFilter startTime . endTimeFilter endTime
 
+offsetTimeFilter :: Time -> Filter
+offsetTimeFilter time = (. (+ time))
+
 cutoffFilterMod :: TimeRange -> Filter -> Filter
 cutoffFilterMod (startTime, endTime) filter sound time = (if (time < startTime || time > endTime) then idFilter else filter) sound time
 
@@ -33,5 +36,5 @@ crescendoFilter timeRange@(startTime, endTime) (startAmp, endAmp) = cutoffFilter
 
 decrescendoFilter = crescendoFilter
 
-addSounds :: Sound -> Filter
+addSounds :: Sound -> Sound -> Sound
 addSounds sound1 sound2 time = sound1 time + sound2 time

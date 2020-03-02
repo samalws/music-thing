@@ -1,4 +1,4 @@
-module MusicThing.Sounds where
+module MusicThing.Sound where
 
 import MusicThing.Types
 import System.Random
