@@ -7,10 +7,10 @@ idFilter :: Filter
 idFilter = id
 
 freqFilter :: Frequency -> Filter
-freqFilter freq sound time = sound $ freq * time
+freqFilter freq = (. (* freq))
 
 volumeFilter :: Amplitude -> Filter
-volumeFilter vol sound = sound . (* vol)
+volumeFilter vol = ((* vol) .)
 
 timeVolumeFilter :: (Time -> Amplitude) -> Filter
 timeVolumeFilter ampFunc sound time = sound time * ampFunc time
