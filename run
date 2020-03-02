@@ -1,4 +1,0 @@
-./compile music
-./music
-mpv a.wav
-rm a.dat a.wav music

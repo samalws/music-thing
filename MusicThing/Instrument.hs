@@ -1,14 +1,11 @@
 module MusicThing.Instrument where
 
-import MusicThing.Filter
-import MusicThing.Combiner
-import MusicThing.Note
+import MusicThing.Types
+import MusicThing.Sounds
+import MusicThing.Filters
+import MusicThing.Tones
 
-type Instrument = [(Double, Double)]
-
-instrumentToTone :: Tone -> Instrument -> Tone
-instrumentToTone tone instrument freq =
-	amplitudeMultiply (1 / (sum $ map snd instrument)) $
-	combineSoundsList addCombiner $ map
-		(\(freqMult, vol) -> amplitudeMultiply vol $ tone $ freqMult * freq)
-		instrument
+instrument :: [(Frequency, Amplitude)] -> Tone -> Tone
+instrument fas tone = volumeFilter (1 / ampSum) . (foldToneList addSounds $ map mapFn fas) where
+	mapFn = ($ tone) . (.) . (\(freq, amp) -> freqFilter freq . volumeFilter amp)
+	ampSum = foldl (+) 0 $ map snd fas

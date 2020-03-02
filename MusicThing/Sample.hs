@@ -1,7 +1,6 @@
 module MusicThing.Sample (Sample, makeSample, sampleToDat) where
 
-import MusicThing.Sound
-import MusicThing.LengthSound
+import MusicThing.Types
 import Numeric
 
 data Sample = Sample {stepVal :: Time, ampsVal :: [Amplitude]} deriving (Show)

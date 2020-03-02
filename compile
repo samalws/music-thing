@@ -1,3 +1,0 @@
-ghc -Wno-tabs $1.hs
-rm *.hi *.o
-rm */*.hi */*.o
