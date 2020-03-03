@@ -3,9 +3,14 @@ module MusicThing.Melody where
 import MusicThing.Types
 import MusicThing.LengthSound
 import MusicThing.Tone
+import Data.Tuple
 
-singleMelody :: [(Time, Maybe Frequency)] -> Tone -> LengthSound
-singleMelody notes tone = foldl appendLengthSounds zeroLengthSound $ map (fmap (maybeTone tone $)) notes
+changeMelodyLengths :: Time -> Melody -> Melody
+changeMelodyLengths timeMult = map $ swap . fmap (* timeMult) . swap
 
-multipleMelody :: [[(Time, Maybe Frequency)]] -> Tone -> LengthSound
-multipleMelody melodies tone = averageLengthSounds $ map (($ tone) . singleMelody) melodies
+singleMelody :: Time -> Melody -> Tone -> LengthSound
+singleMelody pruneLength notes tone = foldl appendLengthSounds zeroLengthSound $
+	map (pruneEndOfLengthSound pruneLength . fmap (maybeTone tone $)) notes
+
+multipleMelody :: Time -> [Melody] -> Tone -> LengthSound
+multipleMelody pruneLength melodies tone = averageLengthSounds $ map (($ tone) . singleMelody pruneLength) melodies

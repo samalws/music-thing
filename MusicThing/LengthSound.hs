@@ -8,7 +8,7 @@ zeroLengthSound :: LengthSound
 zeroLengthSound = (0, zeroSound)
 
 appendLengthSounds :: LengthSound -> LengthSound -> LengthSound
-appendLengthSounds (length1, sound1) (length2, sound2) = (length1 + length2, addSounds (endTimeFilter length1 sound1) (startTimeFilter 0 $ offsetTimeFilter (-length1) sound2))
+appendLengthSounds (length1, sound1) (length2, sound2) = (length1 + length2, addSounds (endTimeFilter length1 sound1) (offsetTimeFilter (-length1) $ startTimeFilter 0 sound2))
 
 overlapLengthSounds :: LengthSound -> LengthSound -> LengthSound
 overlapLengthSounds (length1, sound1) (length2, sound2) = (max length1 length2, addSounds (endTimeFilter length1 sound1) (endTimeFilter length2 sound2))
@@ -21,3 +21,6 @@ lengthSoundToCutoffSound (length, sound) = timeRangeFilter (0, length) sound
 
 timeRangeToLengthSound :: TimeRange -> Sound -> LengthSound
 timeRangeToLengthSound (start, end) sound = appendLengthSounds (start, zeroSound) (end - start, sound)
+
+pruneEndOfLengthSound :: Time -> LengthSound -> LengthSound
+pruneEndOfLengthSound time (length, sound) = (length, decrescendoFilter (length-time, length) (1, 0) sound)

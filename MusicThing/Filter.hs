@@ -32,7 +32,7 @@ cutoffFilterMod (startTime, endTime) filter sound time = (if (time < startTime |
 
 crescendoFilter :: TimeRange -> (Amplitude, Amplitude) -> Filter
 crescendoFilter timeRange@(startTime, endTime) (startAmp, endAmp) = cutoffFilterMod timeRange $ timeVolumeFilter
-	(\time -> (endTime - startTime)*(endAmp-startAmp)*(time-startTime) + startAmp)
+	(\time -> (endAmp-startAmp)*(time-startTime)/(endTime - startTime) + startAmp)
 
 decrescendoFilter = crescendoFilter
 

@@ -8,3 +8,4 @@ type LengthSound = (Time, Sound)
 type Frequency = Double
 type Tone = Frequency -> Sound
 type TimeRange = (Time, Time)
+type Melody = [(Time, Maybe Frequency)]
