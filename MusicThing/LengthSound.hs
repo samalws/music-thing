@@ -22,5 +22,14 @@ lengthSoundToCutoffSound (length, sound) = timeRangeFilter (0, length) sound
 timeRangeToLengthSound :: TimeRange -> Sound -> LengthSound
 timeRangeToLengthSound (start, end) sound = appendLengthSounds (start, zeroSound) (end - start, sound)
 
+pruneStartOfLengthSound :: Time -> LengthSound -> LengthSound
+pruneStartOfLengthSound time (length, sound) = (length, decrescendoFilter (0, time) (0, 1) sound)
+
 pruneEndOfLengthSound :: Time -> LengthSound -> LengthSound
 pruneEndOfLengthSound time (length, sound) = (length, decrescendoFilter (length-time, length) (1, 0) sound)
+
+filterLengthSound :: Filter -> LengthSound -> LengthSound
+filterLengthSound f (l, s) = (l, f s)
+
+replicateLengthSound :: Int -> LengthSound -> LengthSound
+replicateLengthSound n = foldr appendLengthSounds zeroLengthSound . replicate n

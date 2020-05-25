@@ -10,7 +10,7 @@ changeMelodyLengths timeMult = map $ swap . fmap (* timeMult) . swap
 
 singleMelody :: Time -> Melody -> Tone -> LengthSound
 singleMelody pruneLength notes tone = foldl appendLengthSounds zeroLengthSound $
-	map (pruneEndOfLengthSound pruneLength . fmap (maybeTone tone $)) notes
+	map (pruneStartOfLengthSound pruneLength . pruneEndOfLengthSound pruneLength . fmap (maybeTone tone $)) notes
 
 multipleMelody :: Time -> [Melody] -> Tone -> LengthSound
 multipleMelody pruneLength melodies tone = averageLengthSounds $ map (($ tone) . singleMelody pruneLength) melodies
