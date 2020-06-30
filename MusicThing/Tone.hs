@@ -24,3 +24,9 @@ instrument fas tone = volumeFilter (1 / ampSum) . (foldToneList addSounds $ map 
 
 maybeTone :: Tone -> (Maybe Frequency -> Sound)
 maybeTone = (maybe zeroSound $)
+
+addTones :: Tone -> Tone -> Tone
+addTones a b freq = addSounds (a freq) (b freq)
+
+filterTone :: Filter -> Tone -> Tone
+filterTone f t freq = f $ t freq
