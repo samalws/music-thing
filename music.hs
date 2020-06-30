@@ -39,14 +39,14 @@ sineSquareTone a = addTones (filterTone (volumeFilter a) sineWaveTone) (filterTo
 -- [(1, 0.37), (2, 0.52), (3, 0.12), (4, 0.21), (5, 0.14), (6, 0.04), (7, 0.05),
 -- 	(8, 0.08), (9, 0.05), (10, 0.07), (11, 0.11), (12, 0.02), (14, 0.4)]: harpsichord-ish
 
-reallyFastDecay :: Time -> Sound
-reallyFastDecay cutoffTime time
+linearDecay :: Time -> Sound
+linearDecay cutoffTime time
 	| time < 0 = 0
 	| time > cutoffTime = 0
 	| otherwise = 1 - (time / cutoffTime)
 
 decayFilter :: Filter
-decayFilter sound time = sound time * reallyFastDecay 0.1 time
+decayFilter = timeVolumeFilter $ linearDecay 0.1
 
 --------------------------------------------- SCALES
 
