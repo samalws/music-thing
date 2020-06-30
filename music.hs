@@ -5,6 +5,7 @@ import MusicThing.Sound
 import MusicThing.LengthSound
 import MusicThing.Melody
 import MusicThing.Filter
+import Data.Time
 
 --------------------------------------------- UTILS
 
@@ -37,6 +38,15 @@ sineSquareTone a = addTones (filterTone (volumeFilter a) sineWaveTone) (filterTo
 -- [(1, 1), (2, 0.7), (3, 0.35), (4, 0.4), (5, 0.05), (6, 0.25), (7, 0.1), (8, 0.02)]: piano-ish
 -- [(1, 0.37), (2, 0.52), (3, 0.12), (4, 0.21), (5, 0.14), (6, 0.04), (7, 0.05),
 -- 	(8, 0.08), (9, 0.05), (10, 0.07), (11, 0.11), (12, 0.02), (14, 0.4)]: harpsichord-ish
+
+reallyFastDecay :: Time -> Sound
+reallyFastDecay cutoffTime time
+	| time < 0 = 0
+	| time > cutoffTime = 0
+	| otherwise = 1 - (time / cutoffTime)
+
+decayFilter :: Filter
+decayFilter sound time = sound time * reallyFastDecay 0.1 time
 
 --------------------------------------------- SCALES
 
@@ -117,9 +127,17 @@ ls1l = singleMelody 0.1 True (changeMelodyLengths (1/6) melody5l) instrument2
 -- length: 4
 ls1lm = replicateLengthSound 3 ls1l
 
+drumLs :: LengthSound
+drumLs = (0.5, decayFilter $ volumeFilter 0.25 $ staticSound 0)
+drumLsM = replicateLengthSound 24 drumLs
+
+
 mainLs :: LengthSound
-mainLs = replicateLengthSound 2 $ averageLengthSounds [ls0m, ls0fm, ls1m, ls1lm, ls1lm]
+mainLs = replicateLengthSound 1 $ averageLengthSounds [ls0m, ls0fm, ls1m, ls1lm, ls1lm, drumLsM]
 
 main = do
+	start <- getCurrentTime
 	songToWav "a" mainLs
+	end <- getCurrentTime
+	print $ diffUTCTime end start
 	putStrLn "done"
