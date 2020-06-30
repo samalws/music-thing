@@ -36,5 +36,8 @@ crescendoFilter timeRange@(startTime, endTime) (startAmp, endAmp) = cutoffFilter
 
 decrescendoFilter = crescendoFilter
 
+cutoffFilter :: Amplitude -> Filter
+cutoffFilter cutoff sound time = min cutoff $ max (-cutoff) $ sound time
+
 addSounds :: Sound -> Sound -> Sound
 addSounds sound1 sound2 time = sound1 time + sound2 time

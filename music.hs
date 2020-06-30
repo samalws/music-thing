@@ -128,7 +128,7 @@ ls1l = singleMelody 0.1 True (changeMelodyLengths (1/6) melody5l) instrument2
 ls1lm = replicateLengthSound 3 ls1l
 
 drumLs :: LengthSound
-drumLs = (0.5, decayFilter $ volumeFilter 0.25 $ staticSound 0)
+drumLs = (0.5, decayFilter $ cutoffFilter 1 $ volumeFilter 0.25 $ staticSound 0)
 drumLsM = replicateLengthSound 24 drumLs
 
 
